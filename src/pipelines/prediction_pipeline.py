@@ -1,34 +1,39 @@
 import sys
-import os,pickle
+import os
+import pandas as pd
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import load_object
-import pandas as pd
 
 class PredictPipeline:
     def __init__(self):
-        pass
-
-    def predict(self,features):
         try:
-            preprocessor_path=os.path.join('artifacts','preprocessor.pkl')
-            model_path=os.path.join('artifacts','model.pkl')
-            with open(model_path, "rb") as f:
-                model = pickle.load(f)
+            # relative paths to artifacts
+            self.preprocessor_path = os.path.join('artifacts','preprocessor.pkl')
+            self.model_path = os.path.join('artifacts','model.pkl')
 
-            preprocessor=load_object(preprocessor_path)
-            model=load_object(model_path)
-
-            data_scaled=preprocessor.transform(features)
-
-            pred=model.predict(data_scaled)
-            return pred
-            
+            # load objects
+            self.preprocessor = load_object(self.preprocessor_path)
+            self.model = load_object(self.model_path)
 
         except Exception as e:
-            logging.info("Exception occured in prediction")
-            raise CustomException(e,sys)
+            logging.info("Exception occurred while loading model/preprocessor")
+            raise CustomException(e, sys)
+
+    def predict(self, features):
+        try:
+            # transform features
+            data_scaled = self.preprocessor.transform(features)
+
+            # predict
+            pred = self.model.predict(data_scaled)
+            return pred
+
+        except Exception as e:
+            logging.info("Exception occurred in prediction")
+            raise CustomException(e, sys)
         
+
 class CustomData:
     def __init__(self,
                  carat:float,
@@ -41,12 +46,12 @@ class CustomData:
                  color:str,
                  clarity:str):
         
-        self.carat=carat
-        self.depth=depth
-        self.table=table
-        self.x=x
-        self.y=y
-        self.z=z
+        self.carat = carat
+        self.depth = depth
+        self.table = table
+        self.x = x
+        self.y = y
+        self.z = z
         self.cut = cut
         self.color = color
         self.clarity = clarity
@@ -65,10 +70,8 @@ class CustomData:
                 'clarity':[self.clarity]
             }
             df = pd.DataFrame(custom_data_input_dict)
-            logging.info('Dataframe Gathered')
+            logging.info('Dataframe gathered')
             return df
         except Exception as e:
-            logging.info('Exception Occured in prediction pipeline')
-            raise CustomException(e,sys)
-
-
+            logging.info('Exception occurred in CustomData')
+            raise CustomException(e, sys)
