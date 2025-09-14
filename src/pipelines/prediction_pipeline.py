@@ -1,5 +1,5 @@
 import sys
-import os
+import os,pickle
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import load_object
@@ -13,6 +13,8 @@ class PredictPipeline:
         try:
             preprocessor_path=os.path.join('artifacts','preprocessor.pkl')
             model_path=os.path.join('artifacts','model.pkl')
+            with open(model_path, "rb") as f:
+                model = pickle.load(f)
 
             preprocessor=load_object(preprocessor_path)
             model=load_object(model_path)
