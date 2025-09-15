@@ -12,8 +12,8 @@ class PredictPipeline:
     
     def predict(self, features):
         try:
-            preprocessor_path = os.path.join("Artifacts", "preprocessor.pkl")
-            model_path = os.path.join("Artifacts", "model.pkl")
+            preprocessor_path = os.path.join("C:\MLProjects\DiamondPricePrediction2\artifacts\preprocessor.pkl")
+            model_path = os.path.join("C:\MLProjects\DiamondPricePrediction2\artifacts\model.pkl")
             
 
             preprocessor = load_object(preprocessor_path)
