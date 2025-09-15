@@ -25,7 +25,7 @@ class PredictPipeline:
             return pred
         
         except Exception as e:
-            # Use correct class name
+            print("DEBUG: Error in PredictPipeline:", e)
             raise CustomException(e, sys)
     
 
