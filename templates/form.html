@@ -1,78 +1,163 @@
-<html></html>
-<body>
-<form action="{{url_for('predict_datapoint')}}" method="POST">
-    <div class="form-group">
-        <label for="carat">Carat:</label>
-        <input type="text" id="carat" name="carat" placeholder="Enter carat value (float)">
-    </div>
-
-    <div class="form-group">
-        <label for="depth">Depth:</label>
-        <input type="text" id="depth" name="depth" placeholder="Enter depth value (float)">
-    </div>
-
-    <div class="form-group">  
-        <label for="table">Table:</label>
-        <input type="text" id="table" name="table" placeholder="Enter table value (float)">
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Price Predictor</title>
     
-    <div class="form-group">
-        <label for="x">x:</label>
-        <input type="text" id="x" name="x" placeholder="Enter x value (float)">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #fff);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin-top: 50px;
+            padding: 30px;
+            background: #ffffffcc;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00796b;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        input[type="submit"] {
+            background-color: #00796b;
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #004d40;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>💎 Diamond Price Predictor 💎</h1>
+    <form action="{{ url_for('predict_datapoint') }}" method="POST">
+        
+        <!-- Numerical Inputs -->
+        <div class="row mb-3">
+            <div class="col">
+                <label for="carat" class="form-label">Carat</label>
+                <input type="number" step="0.01" id="carat" name="carat" class="form-control" placeholder="0.5" required>
+            </div>
+            <div class="col">
+                <label for="depth" class="form-label">Depth</label>
+                <input type="number" step="0.01" id="depth" name="depth" class="form-control" placeholder="61.5" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="table" class="form-label">Table</label>
+                <input type="number" step="0.01" id="table" name="table" class="form-control" placeholder="55" required>
+            </div>
+            <div class="col">
+                <label for="x" class="form-label">X (length)</label>
+                <input type="number" step="0.01" id="x" name="x" class="form-control" placeholder="5.2" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="y" class="form-label">Y (width)</label>
+                <input type="number" step="0.01" id="y" name="y" class="form-control" placeholder="5.1" required>
+            </div>
+            <div class="col">
+                <label for="z" class="form-label">Z (height)</label>
+                <input type="number" step="0.01" id="z" name="z" class="form-control" placeholder="3.2" required>
+            </div>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="mb-3">
+            <label for="cut" class="form-label">Cut</label>
+            <select id="cut" name="cut" class="form-select" required>
+                <option value="Fair">Fair</option>
+                <option value="Good">Good</option>
+                <option value="Very Good">Very Good</option>
+                <option value="Premium">Premium</option>
+                <option value="Ideal">Ideal</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="color" class="form-label">Color</label>
+            <select id="color" name="color" class="form-select" required>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+                <option value="I">I</option>
+                <option value="J">J</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="clarity" class="form-label">Clarity</label>
+            <select id="clarity" name="clarity" class="form-select" required>
+                <option value="I1">I1</option>
+                <option value="SI2">SI2</option>
+                <option value="SI1">SI1</option>
+                <option value="VS2">VS2</option>
+                <option value="VS1">VS1</option>
+                <option value="VVS2">VVS2</option>
+                <option value="VVS1">VVS1</option>
+                <option value="IF">IF</option>
+            </select>
+        </div>
+
+        <div class="d-grid">
+            <input type="submit" value="Predict Price" class="btn btn-primary btn-lg">
+        </div>
+    </form>
+
+    <!-- Prediction Result -->
+    {% if final_result %}
+    <div class="result">
+        💰 Predicted Price: {{ final_result }} 💰
     </div>
-  
-    <div class="form-group">
-        <label for="y">y:</label>
-        <input type="text" id="y" name="y" placeholder="Enter y value (float)">
-    </div>
-  
-    <div class="form-group">
-        <label for="z">z:</label>
-        <input type="text" id="z" name="z" placeholder="Enter z value (float)">
-    </div>         
-  
-<div class="form-group">
-  <label for="cut">Cut:</label>
-  <select id="cut" name="cut">
-    <option value="Fair">Fair</option>
-    <option value="Good">Good</option>
-    <option value="Very Good">Very Good</option>
-    <option value="Premium">Premium</option>
-    <option value="Ideal">Ideal</option>
-  </select>
-</div>
-  
-<div class="form-group">
-  <label for="color">Color:</label>
-  <select id="color" name="color">
-    <option value="D">D</option>
-    <option value="E">E</option>
-    <option value="F">F</option>
-    <option value="G">G</option>
-    <option value="H">H</option>
-    <option value="I">I</option>
-    <option value="J">J</option>
-  </select>
+    {% endif %}
 </div>
 
-<div class="form-group">
-  <label for="clarity">Clarity:</label>
-  <select id="clarity" name="clarity">
-    <option value="I1">I1</option>
-    <option value="SI2">SI2</option>
-    <option value="SI1">SI1</option>
-    <option value="VS2">VS2</option>
-    <option value="VS1">VS1</option>
-    <option value="VVS2">VVS2</option>
-    <option value="VVS1">VVS1</option>
-    <option value="IF">IF</option>
-  </select>
-</div>
-
-<div style="clear:both;"></div>
-  <input type="submit" value="Submit">
-</form>
-
-{{final_result}}
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
